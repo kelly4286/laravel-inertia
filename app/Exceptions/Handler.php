@@ -3,6 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\App;
+use Inertia\Inertia;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -26,12 +29,51 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Register the exception handling callbacks for the application.
+     * Report or log an exception.
      *
+     * @param  \Throwable  $exception
      * @return void
+     *
+     * @throws \Exception
      */
-    public function register()
+    public function report(Throwable $exception)
     {
-        //
+        parent::report($exception);
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $exception
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
+     */
+    public function render($request, Throwable $exception)
+    {
+        $response = parent::render($request, $exception);
+        $status = $response->getStatusCode();
+        $errorCodes = [
+            401 => 'Unauthorized',
+            403 => $exception->getMessage() ?: 'Forbidden',
+            404 => 'Not Found',
+            419 => 'Page Expired',
+            429 => 'Too Many Requests',
+            500 => 'Server Error',
+            503 => $exception->getMessage() ?: 'Service Unavailable',
+        ];
+
+        if (App::environment('production')
+            && in_array($status, array_keys($errorCodes))) {
+            return Inertia::render('Error', [
+                'code' => $status,
+                'message' => __($errorCodes[$status]),
+            ])
+                ->toResponse($request)
+                ->setStatusCode($status);
+        }
+
+        return $response;
     }
 }

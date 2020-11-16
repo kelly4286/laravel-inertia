@@ -16,7 +16,11 @@ class ShowPost extends Controller
 
         $this->incrementVisit($post);
 
-        $post->load(['author' => fn ($query) => $query->withCount('publishedPosts', 'likedPosts')]);
+        $post->load([
+            'author' => function ($query) {
+                return $query->withCount('publishedPosts', 'likedPosts');
+            }
+        ]);
 
         return Inertia::render('Post/Show', [
             'post' => PostPresenter::make($post)
@@ -24,17 +28,21 @@ class ShowPost extends Controller
                 ->get(),
             'postOnlyLikes' => PostPresenter::make($post)
                 ->only('likes')
-                ->with(fn (Post $post) => [
+                ->with(function (Post $post) { 
+                    return [
                     'is_liked' => $post->isLiked,
-                ])
+                    ];
+                })
                 ->get(),
-            'comments' => fn () => CommentPresenter::collection(
-                $post->comments()
-                    ->with('commenter')
-                    ->latest()
-                    ->get()
-                    ->each->setRelation('post', $post)
-            )->get(),
+            'comments' => function () { 
+                return CommentPresenter::collection(
+                    $post->comments()
+                        ->with('commenter')
+                        ->latest()
+                        ->get()
+                        ->each->setRelation('post', $post)
+                )->get();
+            },
         ]);
     }
 

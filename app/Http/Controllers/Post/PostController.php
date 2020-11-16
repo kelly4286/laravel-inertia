@@ -65,11 +65,13 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         $this->authorize('update', $post);
-
+        
         return Inertia::render('Post/Form', [
-            'post' => PostPresenter::make($post)->with(fn (Post $post) => [
-                'content' => $post->content,
-            ])->get(),
+            'post' => PostPresenter::make($post)->with(function (Post $post) {
+                return [
+                    'content' => $post->content,
+                ];
+            })->get(),
         ]);
     }
 

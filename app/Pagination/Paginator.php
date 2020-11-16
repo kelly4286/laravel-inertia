@@ -32,14 +32,17 @@ class Paginator extends LengthAwarePaginator
     public function linkCollection()
     {
         return collect($this->elements())
-            ->flatMap(fn ($item) => is_array($item)
-                ? collect($item)->map(fn ($url, $page) => [
-                    'url' => $url,
-                    'label' => $page,
-                    'active' => $this->currentPage() === $page,
-                ])
-                : [['url' => null, 'label' => '...', 'active' => false]]
-            )
+            ->flatMap(function ($item) {
+                return is_array($item)
+                ? collect($item)->map(function ($url, $page) { 
+                    return [
+                        'url' => $url,
+                        'label' => $page,
+                        'active' => $this->currentPage() === $page,
+                    ];
+                })
+                : [['url' => null, 'label' => '...', 'active' => false]];
+            })
             ->prepend([
                 'url' => $this->previousPageUrl(),
                 'label' => __('pagination.previous'),

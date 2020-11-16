@@ -17,14 +17,20 @@ cp .env.example .env
 vim .env
 
 # .env
-APP_URL=https://lightning.test
+APP_URL=https://localhost
 ...
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=lightning
+DB_DATABASE=laravel-inertia
 DB_USERNAME=[username]
 DB_PASSWORD=[password]
+```
+
+Generate app key：
+
+```bash
+php artisan key:generate
 ```
 
 跑 Migrate：
@@ -42,6 +48,12 @@ php artisan storage:link
 最後編譯前端資源：
 
 ```bash
-yarn
-yarn dev
+npm install
+npm run dev
+```
+
+執行
+
+```bash
+php artisan serve
 ```

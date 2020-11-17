@@ -26,10 +26,3 @@ Auth::routes(['reset' => false]);
 
 // Upload files
 Route::post('upload/mavon-editor-image', 'UploadController@mavonEditorImage');
-
-
-Route::get('/', function () {
-    return Inertia::render('HelloWorld');
-});
-
-Route::inertia('about', 'About');
